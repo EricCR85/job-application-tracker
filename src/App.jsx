@@ -1,11 +1,10 @@
 import { useState, useEffect } from "react";
-
 import "./App.css";
 
 function App() {
   const [jobs, setJobs] = useState(() => {
     const savedJobs = localStorage.getItem("jobs");
-    return savedJobs 
+    return savedJobs
       ? JSON.parse(savedJobs)
       : [
           {
@@ -16,19 +15,24 @@ function App() {
           },
         ];
   });
-
-  const [filter, setFilter] = useState("all");
+  const [filter, setFilter] = useState("all")
   const [formData, setFormData] = useState({
     company: "",
     role: "",
-    status: "Applied"
+    status: "Applied",
+  });
+
+
+  const [editingId, setEditingId] = useState(null);
+  const [editFormData, setEditFormData] = useState({
+    company: "",
+    role: "",
+    status: "Applied",
   })
 
   useEffect(() => {
     localStorage.setItem("jobs", JSON.stringify(jobs));
   }, [jobs]);
-
-
 
   const handleAddJob = (e) => {
     e.preventDefault();
@@ -50,6 +54,33 @@ function App() {
     setJobs(jobs.filter((job) => job.id !== id));
   };
 
+  const handleEditClick = (job) => {
+    setEditingId(job.id);
+    setEditFormData({
+      company: job.company,
+      role: job.role,
+      status: job.status,
+    });
+  };
+
+  const handleSaveEdit = (e, id) => {
+    e.preventDefault();
+    if (!editFormData.company || !editFormData.role) return;
+
+    setJobs(
+      jobs.map((job) =>
+        job.id === id
+          ? {
+              ...job,
+              company: editFormData.company,
+              role: editFormData.role,
+              status: editFormData.status,
+            }
+          : job,
+      ),
+    );
+    setEditingId(null);
+  };
   return (
     <div className="app-container">
       <header>
@@ -100,11 +131,88 @@ function App() {
             {jobs
               .filter((job) => filter === "all" || job.status === filter)
               .map((job) => (
-                <li key={job.id}>
-                  <strong>{job.company}</strong> - {job.role} ({job.status})
+                <li key={job.id} className="job-card">
+                  {editingId === job.id ? (
+                    <form
+                      onSubmit={(e) => handleSaveEdit(e, job.id)}
+                      className="edit-form-inline"
+                    >
+                      <input
+                        type="text"
+                        value={editFormData.company}
+                        onChange={(e) =>
+                          setEditFormData({
+                            ...editFormData,
+                            company: e.target.value,
+                          })
+                        }
+                        required
+                      />
+                      <input
+                        type="text"
+                        value={editFormData.role}
+                        onChange={(e) =>
+                          setEditFormData({
+                            ...editFormData,
+                            role: e.target.value,
+                          })
+                        }
+                        required
+                      />
+                      <select
+                        value={editFormData.status}
+                        onChange={(e) =>
+                          setEditFormData({
+                            ...editFormData,
+                            status: e.target.value,
+                          })
+                        }
+                      >
+                        <option value="Applied">Applied</option>
+                        <option value="Interviewing">Interviewing</option>
+                        <option value="Offer">Offer</option>
+                        <option value="Rejected">Rejected</option>
+                      </select>
+                      <div className="card-actions">
+                        <button type="submit" className="save-btn">
+                          Save
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleCancelEdit}
+                          className="cancel-btn"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </form>
+                  ) : (
+                        <>
+                    <div>
+                        <strong>{job.company}</strong> - {job.role} ({job.status}
+                        )
+                      </div>
+                      <div className="card-actions">
+                        <button
+                          onClick={() => handleEditClick(job)}
+                          className="edit-btn"
+                          >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDeleteJob(job.id)}
+                          className="delete-btn"
+                          >
+                          Delete
+                        </button>
+                      </div>
+                          </>
+                    
+                  )}
+                  {/* <strong>{job.company}</strong> - {job.role} ({job.status})
                   <button onClick={() => handleDeleteJob(job.id)}>
                     Delete
-                  </button>
+                  </button> */}
                 </li>
               ))}
           </ul>
