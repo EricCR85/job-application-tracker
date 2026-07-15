@@ -12,10 +12,12 @@ function App() {
           role: "Frontend Developer",
           status: "Applied",
           dateApplied: "jul 14, 2026",
+          salary: "$90,000 - $110,000",
+          jobUrl: "https://example.com/job-posting",
           tasks: [
             { id: 101, text: "Tailor resume", completed: true },
-            {id: 102, text: "Submit application porfolio", completed: false },
-          ]
+            { id: 102, text: "Submit application porfolio", completed: false },
+          ],
         },
       ];
     }
@@ -25,6 +27,8 @@ function App() {
       return parsed.map((job) => ({
         ...job,
         tasks: job.tasks || [],
+        salary: job.salary || "",
+        jobUrl: job.jobUrl || "",
       }));
     } catch (e) {
       console.error("Falied to parse jobs from localStorage:", e);
@@ -44,6 +48,8 @@ function App() {
     company: "",
     role: "",
     status: "Applied",
+    salary: "",
+    jobUrl: "",
   });
 
   const [editingId, setEditingId] = useState(null);
@@ -51,9 +57,14 @@ function App() {
     company: "",
     role: "",
     status: "Applied",
+    salary: "",
+    jobUrl: "",
   });
 
   const [taskInputs, setTaskInputs] = useState({});
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState("newest");
 
   useEffect(() => {
     localStorage.setItem("jobs", JSON.stringify(jobs));
@@ -69,6 +80,8 @@ function App() {
       company: formData.company,
       role: formData.role,
       status: formData.status,
+      salary: formData.salary,
+      jobUrl: formData.jobUrl,
       dateApplied: new Date().toLocaleDateString("en-US", {
         month: "short",
         day: "numeric",
@@ -78,7 +91,7 @@ function App() {
     };
 
     setJobs([...jobs, newJob]);
-    setFormData({ company: "", role: "", status: "Applied" });
+    setFormData({ company: "", role: "", status: "Applied", salary: "", jobUrl: "" });
   };
 
   const handleDeleteJob = (id) => {
@@ -134,7 +147,7 @@ function App() {
           };
         }
         return job;
-      })
+      }),
     );
     setTaskInputs({ ...taskInputs, [jobId]: "" });
   };
@@ -146,12 +159,14 @@ function App() {
           return {
             ...job,
             tasks: job.tasks.map((task) =>
-              task.id === taskId ? { ...task, completed: !task.completed } : task
+              task.id === taskId
+                ? { ...task, completed: !task.completed }
+                : task,
             ),
           };
         }
         return job;
-      })
+      }),
     );
   };
 
@@ -160,14 +175,14 @@ function App() {
       jobs.map((job) => {
         if (job.id === jobId) {
           return {
-            ...job, 
+            ...job,
             tasks: job.tasks.filter((task) => task.id !== taskId),
-          }
+          };
         }
         return job;
-      })
-    )
-  }
+      }),
+    );
+  };
 
   const totalJobs = jobs.length;
   const appliedCount = jobs.filter((j) => j.status === "Applied").length;
@@ -176,9 +191,32 @@ function App() {
   ).length;
   const offersCount = jobs.filter((j) => j.status === "Offer").length;
 
-  const filteredJobs = jobs.filter(
-    (job) => filter === "all" || job.status === filter,
-  );
+  const filteredJobs = jobs
+    .filter((job) => filter === "all" || job.status === filter)
+    .filter((job) => {
+      const query = searchQuery.toLowerCase().trim();
+      return (
+        job.company.toLowerCase().includes(query) ||
+        job.role.toLowerCase().includes(query)
+      );
+    })
+    .sort((a, b) => {
+      if (sortBy === "newest") {
+        return new Date(b.dateApplied) - new Date(a.dateApplied) || b.id - a.id;
+      }
+      if (sortBy === "oldest") {
+        return new Date(a.dateApplied) - new Date(b.dateApplied) || a.id - b.id;
+      }
+      if (sortBy === "progress") {
+        const getProgress = (job) => {
+          if (!job.tasks || job.tasks.length === 0) return 0;
+          return job.tasks.filter((t) => t.completed).length / job.tasks.length;
+        };
+        return getProgress(b) - getProgress(a);
+      }
+      return 0;
+    });
+
   return (
     <div className="app-container">
       <header>
@@ -221,6 +259,22 @@ function App() {
                 setFormData({ ...formData, role: e.target.value })
               }
             />
+            <input
+            placeholder="Salary (e.g. $100k or $100,000"
+            value={formData.salary}
+            onChange={(e) => 
+              setFormData({ ...formData, salary: e.target.value })
+            }
+            />
+            <input 
+            type="url"
+            placeholder="Job Link URL (https://..."
+            value={formData.jobUrl}
+            onChange={(e) =>
+              setEditFormData({ ...formData, jobUrl: e.target.value})
+            }
+            />
+            
             <select
               value={formData.status}
               onChange={(e) =>
@@ -236,18 +290,47 @@ function App() {
           </form>
         </section>
 
-        <section className="job-list">
+        <section className="job-list-section">
           <h2>My Applications</h2>
-          <div className="filter-container">
-            <label>Filter by status: </label>
-            <select value={filter} onChange={(e) => setFilter(e.target.value)}>
-              <option value="all">All</option>
-              <option value="Applied">Applied</option>
-              <option value="Interviewing">Interviewing</option>
-              <option value="Offer">Offer</option>
-              <option value="Rejected">Rejected</option>
-            </select>
+
+          <div className="filter-controls-bar">
+            <div className="search-box">
+              <input
+                type="text"
+                placeholder="Search by company or role..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+
+            <div className="filter-selects">
+              <div className="control-group">
+                <label>Status: </label>
+                <select
+                  value={filter}
+                  onChange={(e) => setFilter(e.target.value)}
+                >
+                  <option value="all">All</option>
+                  <option value="Applied">Applied</option>
+                  <option value="Interviewing">Interviewing</option>
+                  <option value="Offer">Offer</option>
+                  <option value="Rejected">Rejected</option>
+                </select>
+              </div>
+              <div className="control-group">
+                <label>Sort By: </label>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                >
+                  <option value="newest">Newest Applied</option>
+                  <option value="oldest">Oldest Applied</option>
+                  <option value="progress">Task Progress</option>
+                </select>
+              </div>
+            </div>
           </div>
+
           <ul className="job-list">
             {filteredJobs.length === 0 ? (
               <li className="no-jobs-message">
@@ -266,167 +349,172 @@ function App() {
                 return (
                   <li key={job.id} className="job-card">
                     {editingId === job.id ? (
-                    <form
-                      onSubmit={(e) => handleSaveEdit(e, job.id)}
-                      className="edit-form-inline"
-                    >
-                      <input
-                        type="text"
-                        value={editFormData.company}
-                        onChange={(e) =>
-                          setEditFormData({
-                            ...editFormData,
-                            company: e.target.value,
-                          })
-                        }
-                        required
-                      />
-                      <input
-                        type="text"
-                        value={editFormData.role}
-                        onChange={(e) =>
-                          setEditFormData({
-                            ...editFormData,
-                            role: e.target.value,
-                          })
-                        }
-                        required
-                      />
-                      <select
-                        value={editFormData.status}
-                        onChange={(e) =>
-                          setEditFormData({
-                            ...editFormData,
-                            status: e.target.value,
-                          })
-                        }
+                      <form
+                        onSubmit={(e) => handleSaveEdit(e, job.id)}
+                        className="edit-form-inline"
                       >
-                        <option value="Applied">Applied</option>
-                        <option value="Interviewing">Interviewing</option>
-                        <option value="Offer">Offer</option>
-                        <option value="Rejected">Rejected</option>
-                      </select>
-                      <div className="card-actions">
-                        <button type="submit" className="save-btn">
-                          Save
-                        </button>
-                        <button
-                          type="button"
-                          onClick={handleCancelEdit}
-                          className="cancel-btn"
+                        <input
+                          type="text"
+                          value={editFormData.company}
+                          onChange={(e) =>
+                            setEditFormData({
+                              ...editFormData,
+                              company: e.target.value,
+                            })
+                          }
+                          required
+                        />
+                        <input
+                          type="text"
+                          value={editFormData.role}
+                          onChange={(e) =>
+                            setEditFormData({
+                              ...editFormData,
+                              role: e.target.value,
+                            })
+                          }
+                          required
+                        />
+                        <select
+                          value={editFormData.status}
+                          onChange={(e) =>
+                            setEditFormData({
+                              ...editFormData,
+                              status: e.target.value,
+                            })
+                          }
                         >
-                          Cancel
-                        </button>
-                      </div>
-                    </form>
-                  ) : (
-                    <>
-                      <div className="job-info">
-                        <div>
-                          <strong>{job.company}</strong> - {job.role}
-                          <span
-                            className={`status-tag status-${job.status.toLowerCase()}`}
-                          >
-                            {job.status}
-                          </span>
-                          {job.dateApplied && (
-                            <span
-                              style={{
-                                fontSize: "0.85em",
-                                color: "#666",
-                                marginLeft: "10px",
-                              }}
-                            >
-                              Applied on {job.dateApplied}
-                            </span>
-                          )}
-                        </div>
+                          <option value="Applied">Applied</option>
+                          <option value="Interviewing">Interviewing</option>
+                          <option value="Offer">Offer</option>
+                          <option value="Rejected">Rejected</option>
+                        </select>
                         <div className="card-actions">
-                          <button
-                            onClick={() => handleDeleteJob(job.id)}
-                            className="delete-btn"
-                          >
-                            Delete
+                          <button type="submit" className="save-btn">
+                            Save
                           </button>
-                        </div>
-                      </div>
-                      <div className="job-tasks-section">
-                        <div className="tasks-header">
-                          <h4>Tasks Checklist</h4>
-                          {hasTasks && (
-                            <span className="tasks-progress">
-                              {completedTasks}/{job.tasks.length} ({taskPercentage}%)
-                            </span>
-                          )}
-                        </div>
-                        {hasTasks && (
-                          <div className="progress-bar-container">
-                            <div
-                              className="progress-bar"
-                              style={{ width: `${taskPercentage}%` }}
-                            ></div>
-                          </div>
-                        )}
-                        <ul className="task-sublist">
-                          {(job.tasks || []).map((task) => (
-                            <li key={task.id} className="task-item">
-                              <label className="task-label">
-                                <input
-                                  type="checkbox"
-                                  checked={task.completed}
-                                  onChange={() => handleToggleTask(job.id, task.id)}
-                                />
-                                <span
-                                  className={
-                                    task.completed
-                                      ? "task-text completed"
-                                      : "task-text"
-                                  }
-                                >
-                                  {task.text}
-                                </span>
-                              </label>
-                              <button
-                                type="button"
-                                className="delete-task-btn"
-                                onClick={() => handleDeleteTask(job.id, task.id)}
-                              >
-                                X
-                              </button>
-                            </li>
-                          ))}
-                        </ul>
-                        <div className="add-task-form">
-                          <input
-                            type="text"
-                            placeholder="Add a step (e.g., Follow up...)"
-                            value={taskInputs[job.id] || ""}
-                            onChange={(e) =>
-                              setTaskInputs({
-                                ...taskInputs,
-                                [job.id]: e.target.value,
-                              })
-                            }
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter") {
-                                e.preventDefault();
-                                handleAddTask(job.id);
-                              }
-                            }}
-                          />
                           <button
                             type="button"
-                            onClick={() => handleAddTask(job.id)}
+                            onClick={handleCancelEdit}
+                            className="cancel-btn"
                           >
-                            Add Task
+                            Cancel
                           </button>
                         </div>
-                      </div>
-                    </>
-                  )}
+                      </form>
+                    ) : (
+                      <>
+                        <div className="job-info">
+                          <div>
+                            <strong>{job.company}</strong> - {job.role}
+                            <span
+                              className={`status-tag status-${job.status.toLowerCase()}`}
+                            >
+                              {job.status}
+                            </span>
+                            {job.dateApplied && (
+                              <span
+                                style={{
+                                  fontSize: "0.85em",
+                                  color: "#666",
+                                  marginLeft: "10px",
+                                }}
+                              >
+                                Applied on {job.dateApplied}
+                              </span>
+                            )}
+                          </div>
+                          <div className="card-actions">
+                            <button
+                              onClick={() => handleDeleteJob(job.id)}
+                              className="delete-btn"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </div>
+                        <div className="job-tasks-section">
+                          <div className="tasks-header">
+                            <h4>Tasks Checklist</h4>
+                            {hasTasks && (
+                              <span className="tasks-progress">
+                                {completedTasks}/{job.tasks.length} (
+                                {taskPercentage}%)
+                              </span>
+                            )}
+                          </div>
+                          {hasTasks && (
+                            <div className="progress-bar-container">
+                              <div
+                                className="progress-bar"
+                                style={{ width: `${taskPercentage}%` }}
+                              ></div>
+                            </div>
+                          )}
+                          <ul className="task-sublist">
+                            {(job.tasks || []).map((task) => (
+                              <li key={task.id} className="task-item">
+                                <label className="task-label">
+                                  <input
+                                    type="checkbox"
+                                    checked={task.completed}
+                                    onChange={() =>
+                                      handleToggleTask(job.id, task.id)
+                                    }
+                                  />
+                                  <span
+                                    className={
+                                      task.completed
+                                        ? "task-text completed"
+                                        : "task-text"
+                                    }
+                                  >
+                                    {task.text}
+                                  </span>
+                                </label>
+                                <button
+                                  type="button"
+                                  className="delete-task-btn"
+                                  onClick={() =>
+                                    handleDeleteTask(job.id, task.id)
+                                  }
+                                >
+                                  X
+                                </button>
+                              </li>
+                            ))}
+                          </ul>
+                          <div className="add-task-form">
+                            <input
+                              type="text"
+                              placeholder="Add a step (e.g., Follow up...)"
+                              value={taskInputs[job.id] || ""}
+                              onChange={(e) =>
+                                setTaskInputs({
+                                  ...taskInputs,
+                                  [job.id]: e.target.value,
+                                })
+                              }
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                  e.preventDefault();
+                                  handleAddTask(job.id);
+                                }
+                              }}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => handleAddTask(job.id)}
+                            >
+                              Add Task
+                            </button>
+                          </div>
+                        </div>
+                      </>
+                    )}
                   </li>
-              );
-            })
+                );
+              })
             )}
           </ul>
         </section>
