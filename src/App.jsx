@@ -91,7 +91,13 @@ function App() {
     };
 
     setJobs([...jobs, newJob]);
-    setFormData({ company: "", role: "", status: "Applied", salary: "", jobUrl: "" });
+    setFormData({
+      company: "",
+      role: "",
+      status: "Applied",
+      salary: "",
+      jobUrl: "",
+    });
   };
 
   const handleDeleteJob = (id) => {
@@ -260,21 +266,21 @@ function App() {
               }
             />
             <input
-            placeholder="Salary (e.g. $100k or $100,000"
-            value={formData.salary}
-            onChange={(e) => 
-              setFormData({ ...formData, salary: e.target.value })
-            }
+              placeholder="Salary (e.g. $100k or $100,000)"
+              value={formData.salary}
+              onChange={(e) =>
+                setFormData({ ...formData, salary: e.target.value })
+              }
             />
-            <input 
-            type="url"
-            placeholder="Job Link URL (https://..."
-            value={formData.jobUrl}
-            onChange={(e) =>
-              setEditFormData({ ...formData, jobUrl: e.target.value})
-            }
+            <input
+              type="url"
+              placeholder="Job Link URL (https://..."
+              value={formData.jobUrl}
+              onChange={(e) =>
+                setEditFormData({ ...formData, jobUrl: e.target.value })
+              }
             />
-            
+
             <select
               value={formData.status}
               onChange={(e) =>
@@ -375,6 +381,29 @@ function App() {
                           }
                           required
                         />
+
+                        <input
+                          type="text"
+                          placeholder="Salary"
+                          value={editFormData.salary}
+                          onChange={(e) =>
+                            setEditFormData({
+                              ...editFormData,
+                              salary: e.target.value,
+                            })
+                          }
+                        />
+                        <input
+                          type="text"
+                          placeholder="job Link url"
+                          value={editFormData.jobUrl}
+                          onChange={(e) =>
+                            setEditFormData({
+                              ...editFormData,
+                              jobUrl: e.target.value,
+                            })
+                          }
+                        />
                         <select
                           value={editFormData.status}
                           onChange={(e) =>
@@ -412,11 +441,24 @@ function App() {
                             >
                               {job.status}
                             </span>
+                            {job.salary && (
+                              <span
+                                style={{
+                                  fontSize: "0.85em",
+                                  color: "#2e7d32",
+                                  fontWeight: "bold",
+                                  marginLeft: "10px",
+                                }}
+                              >
+                                {job.salary}
+                              </span>
+                            )}
                             {job.dateApplied && (
                               <span
                                 style={{
                                   fontSize: "0.85em",
                                   color: "#666",
+                                  fontWeight: "bold",
                                   marginLeft: "10px",
                                 }}
                               >
