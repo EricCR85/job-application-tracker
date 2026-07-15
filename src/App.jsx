@@ -11,12 +11,12 @@ function App() {
           company: "Example Corp",
           role: "Frontend Developer",
           status: "Applied",
-          dateApplied: "jul 14, 2026",
+          dateApplied: "Jul 14, 2026",
           salary: "$90,000 - $110,000",
           jobUrl: "https://example.com/job-posting",
           tasks: [
             { id: 101, text: "Tailor resume", completed: true },
-            { id: 102, text: "Submit application porfolio", completed: false },
+            { id: 102, text: "Submit application portfolio", completed: false },
           ],
         },
       ];
@@ -31,7 +31,7 @@ function App() {
         jobUrl: job.jobUrl || "",
       }));
     } catch (e) {
-      console.error("Falied to parse jobs from localStorage:", e);
+      console.error("Failed to parse jobs from localStorage:", e);
       return [
         {
           id: 1,
@@ -43,7 +43,9 @@ function App() {
       ];
     }
   });
+
   const [filter, setFilter] = useState("all");
+
   const [formData, setFormData] = useState({
     company: "",
     role: "",
@@ -53,6 +55,7 @@ function App() {
   });
 
   const [editingId, setEditingId] = useState(null);
+
   const [editFormData, setEditFormData] = useState({
     company: "",
     role: "",
@@ -62,7 +65,6 @@ function App() {
   });
 
   const [taskInputs, setTaskInputs] = useState({});
-
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("newest");
 
@@ -91,6 +93,7 @@ function App() {
     };
 
     setJobs([...jobs, newJob]);
+
     setFormData({
       company: "",
       role: "",
@@ -106,10 +109,13 @@ function App() {
 
   const handleEditClick = (job) => {
     setEditingId(job.id);
+
     setEditFormData({
       company: job.company,
       role: job.role,
       status: job.status,
+      salary: job.salary || "",
+      jobUrl: job.jobUrl || "",
     });
   };
 
@@ -125,6 +131,8 @@ function App() {
             company: editFormData.company,
             role: editFormData.role,
             status: editFormData.status,
+            salary: editFormData.salary,
+            jobUrl: editFormData.jobUrl,
           };
         }
         return job;
@@ -216,7 +224,8 @@ function App() {
       if (sortBy === "progress") {
         const getProgress = (job) => {
           if (!job.tasks || job.tasks.length === 0) return 0;
-          return job.tasks.filter((t) => t.completed).length / job.tasks.length;
+          const completed = job.tasks.filter((t) => t.completed).length;
+          return Math.round((completed / job.tasks.length) * 100);
         };
         return getProgress(b) - getProgress(a);
       }
@@ -257,6 +266,7 @@ function App() {
               onChange={(e) =>
                 setFormData({ ...formData, company: e.target.value })
               }
+              required
             />
             <input
               placeholder="Role"
@@ -264,6 +274,7 @@ function App() {
               onChange={(e) =>
                 setFormData({ ...formData, role: e.target.value })
               }
+              required
             />
             <input
               placeholder="Salary (e.g. $100k or $100,000)"
@@ -274,13 +285,12 @@ function App() {
             />
             <input
               type="url"
-              placeholder="Job Link URL (https://..."
+              placeholder="Job Link URL (https://...)"
               value={formData.jobUrl}
               onChange={(e) =>
-                setEditFormData({ ...formData, jobUrl: e.target.value })
+                setFormData({ ...formData, jobUrl: e.target.value })
               }
             />
-
             <select
               value={formData.status}
               onChange={(e) =>
@@ -298,7 +308,6 @@ function App() {
 
         <section className="job-list-section">
           <h2>My Applications</h2>
-
           <div className="filter-controls-bar">
             <div className="search-box">
               <input
@@ -308,10 +317,9 @@ function App() {
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-
             <div className="filter-selects">
               <div className="control-group">
-                <label>Status: </label>
+                <label>Status:</label>
                 <select
                   value={filter}
                   onChange={(e) => setFilter(e.target.value)}
@@ -324,7 +332,7 @@ function App() {
                 </select>
               </div>
               <div className="control-group">
-                <label>Sort By: </label>
+                <label>Sort By:</label>
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
@@ -381,7 +389,6 @@ function App() {
                           }
                           required
                         />
-
                         <input
                           type="text"
                           placeholder="Salary"
@@ -441,40 +448,50 @@ function App() {
                             >
                               {job.status}
                             </span>
-                            {job.salary && (
-                              <span
-                                style={{
-                                  fontSize: "0.85em",
-                                  color: "#2e7d32",
-                                  fontWeight: "bold",
-                                  marginLeft: "10px",
-                                }}
-                              >
-                                {job.salary}
-                              </span>
-                            )}
-                            {job.dateApplied && (
-                              <span
-                                style={{
-                                  fontSize: "0.85em",
-                                  color: "#666",
-                                  fontWeight: "bold",
-                                  marginLeft: "10px",
-                                }}
-                              >
-                                Applied on {job.dateApplied}
-                              </span>
-                            )}
                           </div>
-                          <div className="card-actions">
-                            <button
-                              onClick={() => handleDeleteJob(job.id)}
-                              className="delete-btn"
+                          {job.salary && (
+                            <span
+                              style={{
+                                fontSize: "0.85em",
+                                color: "#2e7d32",
+                                fontWeight: "bold",
+                                marginLeft: "10px",
+                              }}
                             >
-                              Delete
-                            </button>
-                          </div>
+                              {job.salary}
+                            </span>
+                          )}
+                          <span
+                            style={{
+                              fontSize: "0.85em",
+                              color: "#666",
+                              fontWeight: "bold",
+                              marginLeft: "10px",
+                            }}
+                          >
+                            Applied on {job.dateApplied}
+                          </span>
+
+                          {job.jobUrl && (
+                            <div
+                              className="job-url-link"
+                              style={{ marginTop: "5px" }}
+                            >
+                              <a
+                                href={job.jobUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{
+                                  fontSize: "0.85em",
+                                  color: "#0066cc",
+                                }}
+                              >
+                                View Job Posting
+                              </a>
+                            </div>
+                          )}
                         </div>
+
                         <div className="job-tasks-section">
                           <div className="tasks-header">
                             <h4>Tasks Checklist</h4>
@@ -485,6 +502,7 @@ function App() {
                               </span>
                             )}
                           </div>
+
                           {hasTasks && (
                             <div className="progress-bar-container">
                               <div
@@ -493,6 +511,7 @@ function App() {
                               ></div>
                             </div>
                           )}
+
                           <ul className="task-sublist">
                             {(job.tasks || []).map((task) => (
                               <li key={task.id} className="task-item">
@@ -521,11 +540,12 @@ function App() {
                                     handleDeleteTask(job.id, task.id)
                                   }
                                 >
-                                  X
+                                  x
                                 </button>
                               </li>
                             ))}
                           </ul>
+
                           <div className="add-task-form">
                             <input
                               type="text"
@@ -552,6 +572,21 @@ function App() {
                             </button>
                           </div>
                         </div>
+
+                        <div className="card-actions">
+                          <button
+                            onClick={() => handleEditClick(job)}
+                            className="edit-btn"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDeleteJob(job.id)}
+                            className="delete-btn"
+                          >
+                            Delete
+                          </button>
+                        </div>
                       </>
                     )}
                   </li>
@@ -566,3 +601,4 @@ function App() {
 }
 
 export default App;
+
