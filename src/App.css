@@ -1,19 +1,19 @@
 :root {
---primary-color: #4f46e5; /* Indigo */
+--primary-color: #4f46e5; 
 --primary-hover: #4338ca;
---bg-app: #f8fafc; /* Very light slate */
+--bg-app: #f8fafc; 
 --bg-card: #ffffff;
---text-main: #1e293b; /* Dark slate */
---text-muted: #64748b; /* Medium slate */
---border-color: #e2e8f0; /* Light gray border */
+--text-main: #1e293b; 
+--text-muted: #64748b; 
+--border-color: #e2e8f0; 
 
---color-applied: #3b82f6; /* Blue */
+--color-applied: #3b82f6; 
 --color-applied-bg: #eff6ff;
---color-interview: #a855f7; /* Purple */
+--color-interview: #a855f7; 
 --color-interview-bg: #faf5ff;
---color-offer: #10b981; /* Emerald Green */
+--color-offer: #10b981; 
 --color-offer-bg: #ecfdf5;
---color-rejected: #ef4444; /* Red */
+--color-rejected: #ef4444; 
 --color-rejected-bg: #fef2f2;
 
 --radius-lg: 12px;
@@ -53,14 +53,12 @@ header h1 {
 font-size: 2.25rem;
 font-weight: 800;
 color: var(--text-main);
-letter-spacing: -0.025em;
+letter-spacing: -0.025rem;
 }
-
-
 
 .stats-dashboard {
 display: grid;
-grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
 gap: 16px;
 margin-bottom: 32px;
 }
@@ -71,7 +69,7 @@ padding: 20px;
 border-radius: var(--radius-lg);
 box-shadow: var(--shadow-sm);
 border: 1px solid var(--border-color);
-border-top: 4px solid var(--text-muted); /* Fallback */
+border-top: 4px solid var(--text-muted); 
 display: flex;
 flex-direction: column;
 align-items: center;
@@ -94,6 +92,10 @@ border-top-color: var(--color-interview);
 border-top-color: var(--color-offer);
 }
 
+.stat-card.status-rejected {
+border-top-color: var(--color-rejected);
+}
+
 .stat-value {
 font-size: 2rem;
 font-weight: 700;
@@ -109,8 +111,6 @@ letter-spacing: 0.05em;
 margin-top: 4px;
 }
 
-
-/* Form to Add Job */
 .add-job-section {
 background: var(--bg-card);
 padding: 24px;
@@ -211,7 +211,6 @@ font-weight: 600;
 color: var(--text-muted);
 }
 
-
 .job-list-section h2 {
 font-size: 1.5rem;
 font-weight: 700;
@@ -226,14 +225,27 @@ flex-direction: column;
 gap: 16px;
 }
 
-.no-jobs-message {
+.no-jobs-message-container {
 text-align: center;
-padding: 40px;
+padding: 48px 24px;
 background: var(--bg-card);
 border-radius: var(--radius-lg);
-border: 1px dashed var(--border-color);
+border: 1px dashed var(--text-muted);
 color: var(--text-muted);
-font-size: 1rem;
+}
+
+.no-jobs-message-container h3 {
+font-size: 1.2rem;
+color: var(--text-main);
+margin: 12px 0 6px;
+}
+
+.no-jobs-message-container p {
+font-size: 0.95rem;
+}
+
+.empty-state-icon {
+font-size: 2.5rem;
 }
 
 .job-card {
@@ -249,17 +261,18 @@ transition: box-shadow var(--transition-fast);
 box-shadow: var(--shadow-md);
 }
 
-.job-card-header {
-display: flex;
-justify-content: space-between;
-align-items: flex-start;
-gap: 16px;
+.job-info {
 margin-bottom: 16px;
 }
 
-.job-card-header strong {
+.job-info div {
 font-size: 1.15rem;
 font-weight: 700;
+color: var(--text-main);
+}
+
+.job-info strong {
+color: var(--primary-color);
 }
 
 .status-tag {
@@ -271,6 +284,7 @@ border-radius: 50px;
 text-transform: uppercase;
 letter-spacing: 0.05em;
 margin-left: 10px;
+vertical-align: middle;
 }
 
 .status-tag.status-applied {
@@ -293,9 +307,41 @@ background-color: var(--color-rejected-bg);
 color: var(--color-rejected);
 }
 
+.job-url-link {
+margin-top: 8px;
+}
+
+.job-url-link a {
+text-decoration: none;
+font-weight: 600;
+transition: color var(--transition-fast);
+}
+
+.job-url-link a:hover {
+text-decoration: underline;
+color: var(--primary-hover);
+}
+
+.job-notes-container {
+background-color: var(--bg-app);
+padding: 12px;
+border-radius: var(--radius-md);
+margin-top: 12px;
+font-size: 0.9rem;
+color: var(--text-main);
+border-left: 3px solid var(--primary-color);
+}
+
+.notes-heading {
+font-weight: 700;
+color: var(--text-muted);
+margin-right: 4px;
+}
+
 .card-actions {
 display: flex;
 gap: 8px;
+margin-top: 16px;
 }
 
 .edit-btn, .delete-btn, .save-btn, .cancel-btn {
@@ -313,12 +359,12 @@ background-color: #e2e8f0;
 }
 
 .delete-btn {
-background-color: #fef2f2;
-color: #dc2626;
+background-color: var(--color-rejected-bg);
+color: var(--color-rejected);
 }
 
 .delete-btn:hover {
-background-color: #fee2e2;
+background-color: #fca5a5;
 }
 
 .save-btn {
@@ -326,29 +372,17 @@ background-color: #059669;
 color: white;
 }
 
-.save-btn:hover {
-background-color: #047857;
-}
-
 .cancel-btn {
-background-color: #64748b;
+background-color: var(--text-muted);
 color: white;
 }
 
-.cancel-btn:hover {
-background-color: #475569;
-}
-
-/* Inline Edit Form Grid */
 .edit-form-inline {
 display: grid;
 grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
 gap: 12px;
-align-items: center;
 width: 100%;
 }
-
-
 
 .job-tasks-section {
 border-top: 1px solid var(--border-color);
@@ -406,7 +440,7 @@ margin-bottom: 16px;
 display: flex;
 justify-content: space-between;
 align-items: center;
-background-color: #f8fafc;
+background-color: #fafafa;
 padding: 8px 12px;
 border-radius: var(--radius-md);
 border: 1px solid #f1f5f9;
@@ -473,3 +507,6 @@ color: white;
 .add-task-form button:hover {
 background-color: #0f172a;
 }
+
+
+

@@ -14,6 +14,7 @@ function App() {
           dateApplied: "Jul 14, 2026",
           salary: "$90,000 - $110,000",
           jobUrl: "https://example.com/job-posting",
+          notes: "Spoke with recruiter on LinkedIn. Follow-up next week!",
           tasks: [
             { id: 101, text: "Tailor resume", completed: true },
             { id: 102, text: "Submit application portfolio", completed: false },
@@ -29,6 +30,7 @@ function App() {
         tasks: job.tasks || [],
         salary: job.salary || "",
         jobUrl: job.jobUrl || "",
+        notes: job.notes || "",
       }));
     } catch (e) {
       console.error("Failed to parse jobs from localStorage:", e);
@@ -39,6 +41,7 @@ function App() {
           role: "Frontend Developer",
           status: "Applied",
           dateApplied: "Jul 14, 2026",
+          notes: "",
         },
       ];
     }
@@ -52,6 +55,7 @@ function App() {
     status: "Applied",
     salary: "",
     jobUrl: "",
+    notes: "",
   });
 
   const [editingId, setEditingId] = useState(null);
@@ -62,6 +66,7 @@ function App() {
     status: "Applied",
     salary: "",
     jobUrl: "",
+    notes: "",
   });
 
   const [taskInputs, setTaskInputs] = useState({});
@@ -84,6 +89,7 @@ function App() {
       status: formData.status,
       salary: formData.salary,
       jobUrl: formData.jobUrl,
+      notes: formData.notes,
       dateApplied: new Date().toLocaleDateString("en-US", {
         month: "short",
         day: "numeric",
@@ -100,11 +106,17 @@ function App() {
       status: "Applied",
       salary: "",
       jobUrl: "",
+      notes: "",
     });
   };
 
   const handleDeleteJob = (id) => {
-    setJobs(jobs.filter((job) => job.id !== id));
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this job application? This action cannot be undone.",
+    );
+    if (confirmDelete) {
+      setJobs(jobs.filter((job) => job.id !== id));
+    }
   };
 
   const handleEditClick = (job) => {
@@ -116,6 +128,7 @@ function App() {
       status: job.status,
       salary: job.salary || "",
       jobUrl: job.jobUrl || "",
+      notes: job.notes || "",
     });
   };
 
@@ -133,6 +146,7 @@ function App() {
             status: editFormData.status,
             salary: editFormData.salary,
             jobUrl: editFormData.jobUrl,
+            notes: editFormData.notes,
           };
         }
         return job;
@@ -185,17 +199,20 @@ function App() {
   };
 
   const handleDeleteTask = (jobId, taskId) => {
-    setJobs(
-      jobs.map((job) => {
-        if (job.id === jobId) {
-          return {
-            ...job,
-            tasks: job.tasks.filter((task) => task.id !== taskId),
-          };
-        }
-        return job;
-      }),
-    );
+    const confirmDelete = window.confirm("Remove this task?");
+    if (confirmDelete) {
+      setJobs(
+        jobs.map((job) => {
+          if (job.id === jobId) {
+            return {
+              ...job,
+              tasks: job.tasks.filter((task) => task.id !== taskId),
+            };
+          }
+          return job;
+        }),
+      );
+    }
   };
 
   const totalJobs = jobs.length;
@@ -204,6 +221,7 @@ function App() {
     (j) => j.status === "Interviewing",
   ).length;
   const offersCount = jobs.filter((j) => j.status === "Offer").length;
+  const rejectedCount = jobs.filter((j) => j.status === "Rejected").length;
 
   const filteredJobs = jobs
     .filter((job) => filter === "all" || job.status === filter)
@@ -255,6 +273,10 @@ function App() {
           <span className="stat-value">{offersCount}</span>
           <span className="stat-label">Offers</span>
         </div>
+        <div className="stat-card status-rejected">
+          <span className="stat-value">{rejectedCount}</span>
+          <span className="stat-label">Rejected</span>
+        </div>
       </section>
 
       <main>
@@ -289,6 +311,14 @@ function App() {
               value={formData.jobUrl}
               onChange={(e) =>
                 setFormData({ ...formData, jobUrl: e.target.value })
+              }
+            />
+            <input
+              type="text"
+              placeholder="Notes/Follow-up notes..."
+              value={formData.notes}
+              onChange={(e) =>
+                setFormData({ ...formData, notes: e.target.value })
               }
             />
             <select
@@ -347,8 +377,13 @@ function App() {
 
           <ul className="job-list">
             {filteredJobs.length === 0 ? (
-              <li className="no-jobs-message">
-                No jobs found under this status.
+              <li className="no-jobs-message-container">
+                <div className="empty-state-icon">🔍</div>
+                <h3>No Applications Found</h3>
+                <p>
+                  Try adjusting your search queries or adding a new application
+                  card up above!
+                </p>
               </li>
             ) : (
               filteredJobs.map((job) => {
@@ -408,6 +443,17 @@ function App() {
                             setEditFormData({
                               ...editFormData,
                               jobUrl: e.target.value,
+                            })
+                          }
+                        />
+                        <input
+                          type="text"
+                          placeholder="Notes/Follow-up plans..."
+                          value={editFormData.notes}
+                          onChange={(e) =>
+                            setEditFormData({
+                              ...editFormData,
+                              notes: e.target.value,
                             })
                           }
                         />
@@ -488,6 +534,13 @@ function App() {
                               >
                                 View Job Posting
                               </a>
+                            </div>
+                          )}
+
+                          {job.notes && (
+                            <div className="job-notes-container">
+                              <span className="notes-heading">Notes:</span>{" "}
+                              {job.notes}
                             </div>
                           )}
                         </div>
@@ -601,4 +654,3 @@ function App() {
 }
 
 export default App;
-
