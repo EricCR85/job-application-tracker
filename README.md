@@ -27,4 +27,4 @@ A modern, responsive dashboard built with React and Vite to help job seekers org
 
 ### 1. Clone the repository
 ```bash
-git clone <your-repository-url>
+git clone https://github.com/EricCR85/job-application-tracker.git

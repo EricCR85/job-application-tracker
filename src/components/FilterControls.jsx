@@ -9,7 +9,6 @@ const FilterControls = ({
 }) => {
   return (
     <div className="filter-controls-bar">
-      {/* Search Input */}
       <div className="search-box">
         <input
           type="text"
