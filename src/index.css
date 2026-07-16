@@ -140,18 +140,6 @@ select:focus {
   font-size: 1rem;
 }
 
-.job-card {
-  background: #f8fafc;
-  padding: 1.2rem;
-  border-radius: 8px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  transition:
-    transform 0.15s ease,
-    box-shadow 0.15s ease;
-  border: 1px solid #e228f0;
-}
 
 .job-card:hover {
   transform: translateY(-2px);
@@ -220,17 +208,7 @@ select:focus {
   color: #991b1b;
 }
 
-.delete-btn {
-  background-color: transparent;
-  color: #94a3b8;
-  border: none;
-  padding: 0.4rem 0.75rem;
-  border-radius: 6px;
-  font-weight: 600;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
+
 
 .delete-btn:hover {
   background-color: #fee2e2;
