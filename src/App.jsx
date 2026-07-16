@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import StatsDashboard from "./components/StatsDashboard";
 import JobForm from "./components/JobForm";
 import FilterControls from "./components/FilterControls";
-import TaskChecklist from "./components/TaskChecklist";
 import JobCard from "./components/JobCard";
 
 import "./App.css";
@@ -299,6 +298,7 @@ function App() {
                   handleToggleTask={handleToggleTask}
                   handleDeleteTask={handleDeleteTask}
                   handleAddTask={handleAddTask}
+                  handleEditClick={handleEditClick}
                 />
               ))
             )}

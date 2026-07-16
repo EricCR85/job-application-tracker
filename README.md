@@ -1,16 +1,30 @@
-# React + Vite
+# 💼 Job Application Tracker
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern, responsive dashboard built with React and Vite to help job seekers organize, track, and manage their job applications. Users can monitor application statuses, log salary information, track progress with custom task checklists, and view key statistics at a glance.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## ✨ Features
 
-## React Compiler
+* **Application Lifecycle Tracking:** Manage jobs across different stages: *Applied, Interviewing, Offer, or Rejected*.
+* **Dynamic Statistics:** View key metrics instantly (total applications, interview rates, and status breakdowns).
+* **Task Checklist:** Keep track of interview preparation, follow-up emails, and custom tasks for each application.
+* **Search & Filter:** Instantly filter applications by company, role, status, or search query.
+* **Inline Editing:** Edit application details directly on each card without navigating away.
+* **Fully Responsive UI:** Clean, modern CSS layout that transitions beautifully from desktop grids to mobile screens.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## 🛠️ Tech Stack
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+* **Frontend Framework:** React 19 (Vite)
+* **Styling:** Custom CSS Grid & Flexbox
+* **Icons:** Lucide React
+
+---
+
+## 🚀 Getting Started
+
+### 1. Clone the repository
+```bash
+git clone <your-repository-url>
