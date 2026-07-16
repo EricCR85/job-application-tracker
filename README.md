@@ -19,12 +19,20 @@ A modern, responsive dashboard built with React and Vite to help job seekers org
 
 * **Frontend Framework:** React 19 (Vite)
 * **Styling:** Custom CSS Grid & Flexbox
-* **Icons:** Lucide React
+* **Storage:** Browser localStorage
+* **Deployment:** Vercel
+
+## 🔗 Live Demo
+
+[View the live project](https://job-application-tracker-git-main-eric-reeves-projects.vercel.app/)
 
 ---
 
 ## 🚀 Getting Started
 
-### 1. Clone the repository
 ```bash
 git clone https://github.com/EricCR85/job-application-tracker.git
+cd job-application-tracker
+npm install
+npm run dev
+```
